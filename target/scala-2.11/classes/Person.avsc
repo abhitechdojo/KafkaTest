@@ -1,6 +1,0 @@
-{
-    "namespace": "com.abhi",
-    "type": "record",
-    "name": "Person",
-    "fields": [{"name": "firstname", "type": "string"}, {"name": "lastname", "type": "string"}]
-}
