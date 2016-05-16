@@ -2,6 +2,8 @@
   * Created by abhishek.srivastava on 5/15/16.
   */
 
+package com.abhi
+
 import org.apache.kafka.clients.consumer._
 import java.util.{Collections, Properties}
 import collection.JavaConversions._

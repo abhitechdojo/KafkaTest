@@ -1,6 +1,7 @@
 /**
   * Created by abhishek.srivastava on 4/28/16.
   */
+package com.abhi
 
 import org.apache.kafka.clients.producer._
 import org.apache.avro.generic.GenericData
