@@ -2,6 +2,8 @@
   * Created by abhishek.srivastava on 5/16/16.
   */
 
+package com.abhi
+
 import org.scalatest._
 
 class KafkaTest extends FunSuite {

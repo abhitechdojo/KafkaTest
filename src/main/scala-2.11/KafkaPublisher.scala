@@ -17,8 +17,8 @@ object KafkaPublisher {
   def SendStringMessage(msg: String) : Unit = {
     val inputRecord = new ProducerRecord[String, String]("test1", "key2", msg)
     val producer: KafkaProducer[String, String] = CreateProducerString
-    producer.send(inputRecord)
-    //println(s"offset: ${rm.offset()} partition: ${rm.partition()} topic: ${rm.topic()}")
+    val rm = producer.send(inputRecord).get
+    println(s"offset: ${rm.offset()} partition: ${rm.partition()} topic: ${rm.topic()}")
     producer.close()
   }
 
@@ -26,8 +26,8 @@ object KafkaPublisher {
     val inputRecord = createAvroRecord(schemaStr, "test1", "test1")
     val producer: KafkaProducer[String, Object] = CreateProducerAvro
     val producerAvroRecord = new ProducerRecord[String, Object]("test2", "key1", inputRecord)
-    producer.send(producerAvroRecord)
-    //println(s"offset: ${rm.offset()} partition: ${rm.partition()} topic: ${rm.topic()}")
+    val rm = producer.send(producerAvroRecord).get
+    println(s"offset: ${rm.offset()} partition: ${rm.partition()} topic: ${rm.topic()}")
     producer.close()
   }
 

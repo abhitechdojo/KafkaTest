@@ -3,7 +3,7 @@
   */
 package com.abhi
 
-object KafkaTest {
+object KafkaMain {
   def main(args: Array[String]) : Unit = {
     val msg = "Hello World"
     println("going to send message")
