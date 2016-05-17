@@ -25,10 +25,10 @@ object KafkaPublisher {
     producer.close()
   }
 
-  def SendAvroMessage(schemaStr: String): Unit = {
-    val inputRecord = createAvroRecord(schemaStr, "test1", "test1")
+  def SendAvroMessage(schemaStr: String, firstName: String, lastName: String): Unit = {
+    val inputRecord = createAvroRecord(schemaStr, firstName, lastName)
     val producer: KafkaProducer[String, Object] = CreateProducerAvro
-    val producerAvroRecord = new ProducerRecord[String, Object]("test", "key1", inputRecord)
+    val producerAvroRecord = new ProducerRecord[String, Object]("test1", "key1", inputRecord)
     val rm = producer.send(producerAvroRecord).get
     println(s"offset: ${rm.offset()} partition: ${rm.partition()} topic: ${rm.topic()}")
     producer.close()
