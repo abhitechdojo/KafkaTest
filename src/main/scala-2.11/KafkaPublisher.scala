@@ -11,13 +11,16 @@ import java.util.Properties
 
 import scala.io.Source
 import java.io._
+import java.util.concurrent.TimeUnit._
+
+import kafka.producer.KeyedMessage
 
 object KafkaPublisher {
 
   def SendStringMessage(msg: String) : Unit = {
-    val inputRecord = new ProducerRecord[String, String]("test1", "key2", msg)
+    val inputRecord = new ProducerRecord[String, String]("test", null, msg)
     val producer: KafkaProducer[String, String] = CreateProducerString
-    val rm = producer.send(inputRecord).get
+    val rm = producer.send(inputRecord).get(10, SECONDS)
     println(s"offset: ${rm.offset()} partition: ${rm.partition()} topic: ${rm.topic()}")
     producer.close()
   }
@@ -25,7 +28,7 @@ object KafkaPublisher {
   def SendAvroMessage(schemaStr: String): Unit = {
     val inputRecord = createAvroRecord(schemaStr, "test1", "test1")
     val producer: KafkaProducer[String, Object] = CreateProducerAvro
-    val producerAvroRecord = new ProducerRecord[String, Object]("test2", "key1", inputRecord)
+    val producerAvroRecord = new ProducerRecord[String, Object]("test", "key1", inputRecord)
     val rm = producer.send(producerAvroRecord).get
     println(s"offset: ${rm.offset()} partition: ${rm.partition()} topic: ${rm.topic()}")
     producer.close()
@@ -48,19 +51,21 @@ object KafkaPublisher {
 
   private def CreateProducerString: KafkaProducer[String, String] = {
     val props = new Properties()
-    props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.99.100:9092")
-    props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer")
-    props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer")
+    props.put("bootstrap.servers", "localhost:9092")
+    props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
+    props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer")
+    props.put("batch.size", "0")
+    props.put("client.id", "1")
     val producer = new KafkaProducer[String, String](props)
     producer
   }
 
   private def CreateProducerAvro: KafkaProducer[String, Object] = {
     val props = new Properties()
-    props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.99.100:9092")
-    props.put("schema.registry.url", "http://192.168.99.100:8081")
-    props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer")
-    props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "io.confluent.kafka.serializers.KafkaAvroSerializer")
+    props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092")
+    props.put("schema.registry.url", "http://localhost:8081")
+    props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
+    props.put("value.serializer", "io.confluent.kafka.serializers.KafkaAvroSerializer")
     val producer = new KafkaProducer[String, Object](props)
     producer
   }
