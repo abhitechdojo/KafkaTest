@@ -4,10 +4,11 @@
 
 package com.abhi
 
-import org.apache.kafka.clients.consumer._
 import java.util.{Collections, Properties}
-import collection.JavaConversions._
-import org.apache.kafka.clients.producer.ProducerConfig
+
+import org.apache.kafka.clients.consumer._
+
+import scala.collection.JavaConversions._
 
 object KafkaConsumerString {
   def ReadMessage : Unit = {
@@ -23,13 +24,14 @@ object KafkaConsumerString {
       consumer.subscribe(Collections.singletonList("test"))
       var flag = true
       while (flag) {
-        val records: ConsumerRecords[String, String] = consumer.poll(0) // batch
+        val records: ConsumerRecords[String, String] = consumer.poll(10) // batch
         for (
           record: ConsumerRecord[String, String] <- records
         ) {
-          println(s"topic: %s key %s value %s partition %s offset %s", record.topic(), record.key(), record.value(), record.partition(), record.offset())
-          flag = if (record.value() == "break") { false } else { true }
+          println(s"topic: ${record.topic()} key ${record.key()} msg ${record.value()} partition ${record.partition()} offset ${record.offset()}")
+          flag = if (record.value().toString.trim == "Hello World 100") { false } else { true }
         }
+        consumer.commitSync()
       }
     }
     finally {

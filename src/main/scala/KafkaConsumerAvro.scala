@@ -4,10 +4,11 @@
 
 package com.abhi
 
-import org.apache.kafka.clients.consumer._
 import java.util.{Collections, Properties}
-import collection.JavaConversions._
-import org.apache.kafka.clients.producer.ProducerConfig
+
+import org.apache.kafka.clients.consumer._
+
+import scala.collection.JavaConversions._
 
 object KafkaConsumerAvro {
   def ReadMessage : Unit = {
@@ -17,21 +18,22 @@ object KafkaConsumerAvro {
       props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092")
       props.put("zookeeper.server", "localhost:2181")
       props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer")
-      props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer")
+      props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "com.abhi.PersonDeserializer")
       props.put("group.id", "foo")
       props.put("enable.auto.commit", "false")
       consumer = new KafkaConsumer[String, Object](props)
-      consumer.subscribe(Collections.singletonList("test"))
+      consumer.subscribe(Collections.singletonList("test1"))
       var flag = true
       while (flag) {
-        val records: ConsumerRecords[String, Object] = consumer.poll(0) // batch
-        for (
+        val records: ConsumerRecords[String, Object] = consumer.poll(10) // batch
+        for {
           record: ConsumerRecord[String, Object] <- records
-        ) {
-          println(s"topic: %s key %s value %s partition %s offset %s", record.topic(), record.key(), record.value(), record.partition(), record.offset())
-          flag = if (record.value() == "break") { false } else { true }
+        } {
+          val person = record.value().asInstanceOf[Person]
+          println(s"topic: ${record.topic()} key ${record.key()} first name: ${person.firstName} last name: ${person.lastName} partition ${record.partition()} offset ${record.offset()}")
+          flag = if (person.firstName == "test 100") { false } else { true }
         }
-        consumer.commitAsync
+        consumer.commitSync()
       }
     }
     finally {
