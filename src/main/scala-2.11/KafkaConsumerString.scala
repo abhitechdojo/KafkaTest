@@ -9,7 +9,7 @@ import java.util.{Collections, Properties}
 import collection.JavaConversions._
 import org.apache.kafka.clients.producer.ProducerConfig
 
-object KafkaConsumer {
+object KafkaConsumerString {
   def ReadMessage : Unit = {
     var consumer : KafkaConsumer[String, String] = null
     try {

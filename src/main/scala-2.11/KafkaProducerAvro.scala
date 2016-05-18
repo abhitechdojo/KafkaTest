@@ -15,15 +15,7 @@ import java.util.concurrent.TimeUnit._
 
 import kafka.producer.KeyedMessage
 
-object KafkaPublisher {
-
-  def SendStringMessage(msg: String) : Unit = {
-    val inputRecord = new ProducerRecord[String, String]("test", null, msg)
-    val producer: KafkaProducer[String, String] = CreateProducerString
-    val rm = producer.send(inputRecord).get(10, SECONDS)
-    println(s"offset: ${rm.offset()} partition: ${rm.partition()} topic: ${rm.topic()}")
-    producer.close()
-  }
+object KafkaProducerAvro {
 
   def SendAvroMessage(schemaStr: String, firstName: String, lastName: String): Unit = {
     val inputRecord = createAvroRecord(schemaStr, firstName, lastName)
@@ -47,17 +39,6 @@ object KafkaPublisher {
     val stream: InputStream = getClass.getResourceAsStream("/Person.avsc")
     val schemaStr = Source.fromInputStream(stream).getLines.mkString
     schemaStr
-  }
-
-  private def CreateProducerString: KafkaProducer[String, String] = {
-    val props = new Properties()
-    props.put("bootstrap.servers", "localhost:9092")
-    props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
-    props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer")
-    props.put("batch.size", "0")
-    props.put("client.id", "1")
-    val producer = new KafkaProducer[String, String](props)
-    producer
   }
 
   private def CreateProducerAvro: KafkaProducer[String, Object] = {

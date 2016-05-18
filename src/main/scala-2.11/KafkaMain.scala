@@ -10,15 +10,15 @@ object KafkaMain {
   def main(args: Array[String]) : Unit = {
     val f = Future {
       println("going to subscribe")
-      KafkaConsumer.ReadMessage
+      KafkaConsumerString.ReadMessage
       println("message subscribed successfully")
     }
 
     for (i <- 1 to 100) {
       val msg = "Hello World " + i
-      KafkaPublisher.SendStringMessage(msg)
+      KafkaProducerString.SendStringMessage(msg)
     }
-    KafkaPublisher.SendStringMessage("break")
+    KafkaProducerString.SendStringMessage("break")
 
     Await.result(f, 1000 second)
   }
